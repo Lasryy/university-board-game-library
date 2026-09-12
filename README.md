@@ -1,371 +1,741 @@
-# SAE4.01 : Développement d'une application de gestion de collection de jeux
+# University Board Game Library
 
-## 🎯 Aperçu du projet
+Full-stack web application designed to organize, search and manage a university collection of more than **17,000 board games**, including historical games dating back to the 19th century.
 
-L'Université Sorbonne Paris Nord possède une collection exceptionnelle de plus de 17 000 jeux de société, certains datant du XIXe siècle. Ce projet vise à concevoir une application web complète accompagnée de scripts pour gérer, organiser, et valoriser cette collection unique.
+Developed as a collaborative academic project at **Université Sorbonne Paris Nord**, the application combines a **PHP MVC web application**, a **MySQL relational database** and **Python data-processing tools**.
 
-![Aperçu du site](archive/App/assets/images/site-demo2.gif)
+[View the full case study on my portfolio](https://lasrybeskiwin.fr/work/university-board-game-library/)
+
+![University Board Game Library preview](archive/App/assets/images/site-demo2.gif)
 
 ---
 
-## Contexte
-L'Université Sorbonne Paris Nord possède une collection exceptionnelle de plus de 17 000 jeux de société, certains datant du XIXe siècle. Ce projet vise à concevoir une application web accompagnée de scripts pour gérer, organiser, et valoriser cette collection.
+## Overview
 
+Université Sorbonne Paris Nord maintains a large board-game collection containing more than **17,000 items**.
 
-## Nouveaux ajouts et améliorations
+The original data was spread across heterogeneous spreadsheet files. The project therefore involved more than building a web interface: the data first had to be cleaned, normalized and reorganized into a relational model that could support real application workflows.
 
-Au cours du projet, plusieurs ajouts et améliorations ont été réalisés afin de le finaliser :
+The final system provides tools for:
 
-- Refonte du style du site
-- Ajustement de la base de données pour la gestion de l’historique
-- Export de données
-- Suivi des prêts
-- Ajout de la localisation physique
-- Ajout de filtre de recherche pour le suivi de prêt
-- Ajout d’une barre de recherche dans le panneau d’administration
+- browsing and searching the collection
+- managing games and physical copies
+- tracking physical storage locations
+- managing loans and returns
+- maintaining historical records
+- handling several user roles
+- administering users and inventory
+- exporting collection data to Excel
+
+---
+
+## Key Features
+
+### Collection management
+
+- Catalogue of **17,000+ board games**
+- Multi-criteria search
+- Detailed game information
+- Authors, publishers, categories and mechanisms
+- Physical copy management
+- Storage room and shelf tracking
+- Game condition tracking
+- Barcode information
+- Collection provenance
+
+### Loans
+
+- Loan registration and tracking
+- Return management
+- Availability tracking
+- Borrower information
+- Loan history
+- Administrative loan management
+
+### Authentication and accounts
+
+The application includes account creation, authentication and profile management.
+
+Authentication features include:
+
+- email validation
+- password strength validation
+- password hashing with **Argon2id**
+- session-based authentication
+- password verification and updates
+- editable account information
+
+Three application roles are represented in the data model:
+
+```text
+Admin
+Gestionnaire
+Utilisateur
+```
+
+### Administration
+
+Administrative interfaces provide access to:
+
+- user management
+- inventory management
+- loan management
+- collection search
+- historical records
+- data export
+
+### Excel export
+
+Administrators can generate an Excel export of the collection.
+
+The PHP application invokes a Python export script which:
+
+1. connects to MySQL
+2. queries the relational dataset
+3. reconstructs collection information
+4. generates an `.xlsx` file
+5. returns the generated file through the web application
+
+---
+
+## Data Pipeline
+
+One of the main technical challenges was transforming the original spreadsheet-based inventory into structured relational data.
+
+```text
+Excel / source data
+        │
+        ▼
+Python
+Pandas / OpenPyXL
+        │
+        ▼
+Cleaning & normalization
+        │
+        ▼
+Structured CSV data
+        │
+        ▼
+MySQL import
+        │
+        ▼
+Relational data model
+        │
+        ▼
+PHP MVC application
+```
+
+The Python tooling handles operations such as:
+
+- duplicate removal
+- missing-value handling
+- string normalization
+- whitespace cleanup
+- restructuring source columns
+- preparing data for SQL import
+
+---
+
+## Architecture
+
+The application follows a server-rendered **MVC architecture**.
+
+```text
+Browser
+   │
+   ▼
+PHP Controllers
+   │
+   ├──── Views
+   │
+   ▼
+Model
+   │
+   ▼
+MySQL
+```
+
+### Controllers
+
+Application flows are separated into dedicated controllers, including:
+
+```text
+Controller_administration.php
+Controller_connexion_inscription.php
+Controller_exportation.php
+Controller_historique.php
+Controller_home.php
+Controller_list.php
+Controller_monCompte.php
+Controller_recherche.php
+Controller_set.php
+```
+
+They coordinate user actions, validation, sessions and interactions with the data layer.
+
+### Model
+
+The application uses a central PHP model for database access and business operations.
+
+It handles data related to:
+
+- games
+- physical boxes
+- users
+- borrowers
+- loans
+- locations
+- collections
+- authors
+- publishers
+- categories
+- mechanisms
+- history
+
+### Relational database
+
+The MySQL schema separates the collection into normalized entities.
+
+Some of the principal tables are:
+
+```text
+jeu
+boite
+utilisateur
+emprunteur
+pret
+historique
+localisation
+collection
+auteur
+editeur
+categorie
+mecanisme
+```
+
+Many-to-many relationships are represented through association tables:
+
+```text
+jeu_auteur
+jeu_editeur
+jeu_categorie
+jeu_mecanisme
+```
+
+---
+
+## My Contribution
+
+This was a collaborative project.
+
+My contribution focused primarily on:
+
+- PHP authentication and registration flows
+- user account management
+- form validation and account-related interactions
+- Python data-cleaning and normalization tooling
+- preparation of the large source dataset for relational storage
+- contributions to SQL import and testing workflows
+- integration work across the application and database
+
+The project gave me practical experience working on an existing shared codebase rather than building an isolated individual application.
+
+---
+
+## Tech Stack
+
+| Area | Technologies |
+| --- | --- |
+| Backend | PHP |
+| Database | MySQL, SQL |
+| Data processing | Python, Pandas, OpenPyXL |
+| Excel export | Python, OpenPyXL, MySQL Connector |
+| Frontend | HTML, CSS, JavaScript |
+| Architecture | MVC, relational data modelling |
+| Environment | Apache / XAMPP |
+
+---
+
+## Project Structure
+
+```text
+university-board-game-library/
+│
+├── app/
+│   ├── Controllers/
+│   ├── Models/
+│   ├── Views/
+│   ├── Content/
+│   ├── identifiants/
+│   ├── scripts/
+│   │   ├── data/
+│   │   └── scripts_exportation/
+│   └── index.php
+│
+├── SQL/
+│   ├── creation_tables.sql
+│   ├── script_insertion.sql
+│   └── Model EA modifié.pdf
+│
+├── scripts/
+│   ├── data/
+│   └── scripts_nettoyage/
+│       ├── nettoyage.py
+│       ├── utils.py
+│       └── utils_test.py
+│
+├── archive/
+└── README.md
+```
+
+---
+
+## Getting Started
+
+### Requirements
+
+You will need:
+
+- PHP
+- Apache or XAMPP
+- MySQL
+- Python 3
+- pip
+- a modern web browser
+
+Python dependencies used by the project include:
+
+```text
+pandas
+openpyxl
+mysql-connector-python
+```
+
+---
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Lasryy/university-board-game-library.git
+cd university-board-game-library
+```
+
+---
+
+### 2. Prepare the database
+
+The SQL schema is located in:
+
+```text
+SQL/creation_tables.sql
+```
+
+The current script imports the original inventory through `LOAD DATA INFILE`.
+
+Before running it, update the inventory path according to your MySQL installation.
+
+For example:
+
+```sql
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/inventaire.csv'
+INTO TABLE TempJeux
+...
+```
+
+Then run:
+
+```text
+SQL/creation_tables.sql
+SQL/script_insertion.sql
+```
+
+in that order.
+
+> The repository was developed primarily in a Windows/XAMPP environment, so local paths may need to be adapted for another setup.
+
+---
+
+### 3. Configure the database connection
+
+Configure your local database credentials in:
+
+```text
+app/identifiants/identifiant.php
+```
+
+The application expects values such as:
+
+```php
+$dsn = 'mysql:host=localhost;dbname=your_database';
+$host = 'localhost';
+$username = 'your_username';
+$password = 'your_password';
+$database = 'your_database';
+```
+
+Do not commit real credentials to a public repository.
+
+---
+
+### 4. Install Python dependencies
+
+```bash
+pip install pandas openpyxl mysql-connector-python
+```
+
+The source-data cleaning utilities are located in:
+
+```text
+scripts/scripts_nettoyage/
+```
+
+The Excel export tooling is located in:
+
+```text
+app/scripts/scripts_exportation/
+```
+
+---
+
+### 5. Run the application
+
+With XAMPP, place the application inside the Apache web root.
+
+For example:
+
+```text
+C:/xampp/htdocs/app/
+```
+
+Start:
+
+```text
+Apache
+MySQL
+```
+
+Then open:
+
+```text
+http://localhost/app/
+```
+
+---
+
+## Team
+
+Developed collaboratively by:
+
+- [Lasry BESKIWIN](https://github.com/Lasryy)
+- [Rania BOUSFIHA](https://github.com/rania212)
+- [Safiya NGUYEN](https://github.com/safiya-ng)
+- [Ahash PARTHIPAN](https://github.com/AhashPARTHIPAN)
+- [Jules RICHARDOT](https://github.com/JulesRichardot)
+
+---
+
+## Academic Context
+
+This application was developed at **Université Sorbonne Paris Nord** as part of a university software-development project.
+
+The project involved several complementary software-engineering challenges:
+
+- processing a large heterogeneous dataset
+- migrating spreadsheet data into a relational model
+- designing SQL relationships
+- integrating PHP and MySQL
+- structuring a web application using MVC
+- implementing authentication and role-based workflows
+- managing loans and historical information
+- building administrative interfaces
+- collaborating through a shared codebase
+
+---
+
+## What This Project Demonstrates
+
+This project demonstrates practical experience with:
+
+- full-stack web development
+- PHP MVC architecture
+- relational database modelling
+- SQL and MySQL
+- authentication and session management
+- large dataset processing
+- Python automation
+- Pandas and OpenPyXL
+- data migration
+- collaborative development
+- business-oriented application design
+
+---
+
+<details>
+<summary><strong>🇫🇷 Version française</strong></summary>
+
+<br>
+
+# Ludothèque universitaire
+
+Application web full stack conçue pour organiser, rechercher et gérer une collection universitaire de plus de **17 000 jeux de société**, dont certains remontent au XIXe siècle.
+
+Développé en équipe à **l'Université Sorbonne Paris Nord**, le projet combine une application **PHP en architecture MVC**, une base relationnelle **MySQL** et des outils de traitement de données en **Python**.
+
+[Voir l'étude de cas complète sur mon portfolio](https://lasrybeskiwin.fr/work/university-board-game-library/)
+
+![Aperçu de la ludothèque universitaire](archive/App/assets/images/site-demo2.gif)
+
+---
+
+## Présentation
+
+La collection était initialement décrite dans plusieurs fichiers de données nécessitant un important travail de nettoyage et de restructuration.
+
+Le projet a donc consisté à construire à la fois :
+
+- un pipeline de préparation des données
+- une base de données relationnelle
+- une application web métier permettant d'exploiter la collection
+
+L'application permet notamment :
+
+- la consultation de plus de **17 000 jeux**
+- la recherche multicritère
+- la gestion des exemplaires physiques
+- la localisation des boîtes
+- la gestion des prêts
+- le suivi de l'historique
+- la gestion de plusieurs rôles utilisateurs
+- l'administration de la collection
+- l'export des données vers Excel
+
+---
 
 ## Fonctionnalités principales
-- **Nettoyage des données** : Correction des incohérences dans les fichiers Excel.
-- **Base de données relationnelle** : Organisation structurée des informations.
-- **Interface web** : Recherche avancée, gestion des prêts, et gestion de l’inventaire.
-- **Scripts Python** : Manipulation automatisée des données.
 
---- 
+### Collection
 
-## Structure du projet
-```plaintext
-SAE3.01-main/
-├── app/              # Site web principal (MVC)
-├── sql/              # Scripts SQL pour la base de données
-├── scripts/          # Scripts Python et fichiers de données
-├── archive/          # Prototype initial en HTML
-├── README.md         # Documentation principale
+- Recherche dans le catalogue
+- Filtres multicritères
+- Informations détaillées sur les jeux
+- Gestion des exemplaires
+- Localisation physique
+- État des boîtes
+- Codes-barres
+- Auteurs, éditeurs, catégories et mécanismes
+
+### Prêts
+
+- Enregistrement des prêts
+- Suivi des retours
+- Gestion de la disponibilité
+- Historique
+- Administration des emprunts
+
+### Comptes utilisateurs
+
+L'application dispose d'un système de comptes comprenant :
+
+- inscription
+- connexion
+- validation des formulaires
+- sessions PHP
+- hachage des mots de passe avec **Argon2id**
+- modification des informations du profil
+- changement de mot de passe
+
+Le modèle distingue trois rôles :
+
+```text
+Admin
+Gestionnaire
+Utilisateur
 ```
-=======
-## 🚀 Fonctionnalités principales
 
-### 📊 Gestion de l'inventaire
+### Export
 
-- **Recherche avancée** : Recherche multicritères (titre, auteur, mécanisme, catégorie, etc.)
-- **Gestion des jeux** : Ajout, modification et suppression de jeux
-- **Localisation physique** : Suivi de l'emplacement des boîtes de jeux
-- **Gestion des états** : Suivi de l'état de conservation des jeux
-
-### 👥 Gestion des utilisateurs
-
-- **Système d'authentification** : Connexion/inscription sécurisée
-- **Gestion des rôles** : Admin, Gestionnaire, Utilisateur
-- **Profils utilisateurs** : Gestion des informations personnelles
-- **Mon compte** : Interface personnalisée pour chaque utilisateur
-
-### 📚 Gestion des prêts
-
-- **Système de réservation** : Emprunt et retour de jeux
-- **Suivi des prêts** : Historique complet des emprunts
-- **Gestion des retards** : Suivi des retours en retard
-- **Historique des actions** : Traçabilité complète des opérations
-
-### 🔧 Administration
-
-- **Panneau d'administration** : Interface dédiée aux administrateurs
-- **Gestion des utilisateurs** : Création, modification, suppression
-- **Gestion des réservations** : Validation et suivi des prêts
-- **Barre de recherche** : Recherche rapide dans l'administration
-
-### 📈 Export et rapports
-
-- **Export Excel** : Génération de rapports au format Excel
-- **Scripts Python** : Automatisation des tâches de nettoyage
-- **Données structurées** : Export des données de la collection
+Un administrateur peut déclencher depuis l'application un script Python qui interroge MySQL et génère un fichier Excel contenant les informations de la collection.
 
 ---
 
-## 🏗️ Architecture technique
+## Pipeline de données
 
-### Structure MVC (Model-View-Controller)
-
+```text
+Données Excel
+      │
+      ▼
+Python
+Pandas / OpenPyXL
+      │
+      ▼
+Nettoyage & normalisation
+      │
+      ▼
+Données structurées
+      │
+      ▼
+Import MySQL
+      │
+      ▼
+Base relationnelle
+      │
+      ▼
+Application PHP MVC
 ```
-app/
-├── Controllers/          # Logique métier
-│   ├── Controller.php                    # Contrôleur principal
-│   ├── Controller_administration.php     # Gestion administration
-│   ├── Controller_connexion_inscription.php # Authentification
-│   ├── Controller_exportation.php        # Export de données
-│   ├── Controller_historique.php         # Historique des actions
-│   ├── Controller_home.php               # Page d'accueil
-│   ├── Controller_list.php               # Liste des jeux
-│   ├── Controller_monCompte.php          # Gestion du compte
-│   ├── Controller_recherche.php          # Recherche avancée
-│   └── Controller_set.php                # Configuration
-├── Models/              # Accès aux données
-│   └── Model.php                        # Modèle principal
-├── Views/               # Interface utilisateur
-│   ├── view_administration.php          # Panneau admin
-│   ├── view_connexion_inscription.php   # Page de connexion
-│   ├── view_historique.php              # Historique
-│   ├── view_home.php                    # Accueil
-│   ├── view_liste_jeuPopulaire.php      # Liste des jeux
-│   ├── view_monCompte.php               # Mon compte
-│   ├── view_rechercheAvancee.php        # Recherche
-│   └── ...                              # Autres vues
-├── Content/             # Ressources statiques
-│   ├── css/                             # Styles CSS
-│   └── img/                             # Images
-└── identifiants/        # Configuration BDD
-    └── identifiant.php                  # Paramètres de connexion
-```
-
-### Base de données relationnelle
-
-- **Tables principales** : `jeu`, `boite`, `utilisateur`, `emprunteur`, `pret`
-- **Tables de liaison** : `jeu_auteur`, `jeu_categorie`, `jeu_editeur`, `jeu_mecanisme`
-- **Tables de référence** : `auteur`, `categorie`, `editeur`, `mecanisme`, `localisation`, `collection`
-- **Traçabilité** : `historique` pour le suivi des actions
 
 ---
 
-## 🛠️ Installation et configuration
+## Architecture
 
-### Prérequis système
+```text
+Navigateur
+    │
+    ▼
+Contrôleurs PHP
+    │
+    ├──── Vues
+    │
+    ▼
+Modèle
+    │
+    ▼
+MySQL
+```
 
-- **Serveur web** : [XAMPP](https://www.apachefriends.org/index.html) (Apache + MySQL)
-- **Python** : Version 3.x avec `pip`
-- **MySQL** : Version 8.0 ou 9.1
-- **Navigateur web** : Chrome, Firefox, Safari, Edge
+La base sépare notamment :
 
-### 📋 Étapes d'installation
+```text
+jeu
+boite
+utilisateur
+emprunteur
+pret
+historique
+localisation
+collection
+auteur
+editeur
+categorie
+mecanisme
+```
 
-#### 1. Téléchargement du projet
+avec des tables de liaison telles que :
+
+```text
+jeu_auteur
+jeu_editeur
+jeu_categorie
+jeu_mecanisme
+```
+
+---
+
+## Ma contribution
+
+Ce projet a été réalisé collectivement.
+
+Ma contribution s'est principalement concentrée sur :
+
+- les parcours PHP d'inscription et d'authentification
+- la gestion du compte utilisateur
+- la validation des formulaires liés aux comptes
+- les scripts Python de nettoyage et de normalisation
+- la préparation des données sources pour leur stockage relationnel
+- des contributions aux scripts d'import et de test SQL
+- l'intégration entre plusieurs parties de l'application
+
+---
+
+## Stack technique
+
+| Domaine | Technologies |
+| --- | --- |
+| Backend | PHP |
+| Base de données | MySQL, SQL |
+| Traitement de données | Python, Pandas, OpenPyXL |
+| Export Excel | Python, OpenPyXL, MySQL Connector |
+| Frontend | HTML, CSS, JavaScript |
+| Architecture | MVC, modèle relationnel |
+| Environnement | Apache / XAMPP |
+
+---
+
+## Installation
+
+### Cloner le projet
 
 ```bash
-# Cloner le dépôt
-git clone https://github.com/votre_projet/SAE4.01-Developpement-d-une-application-develop.git
-
-# Ou télécharger et extraire l'archive ZIP
+git clone https://github.com/Lasryy/university-board-game-library.git
+cd university-board-game-library
 ```
 
-#### 2. Configuration de la base de données
+### Préparer MySQL
 
-**a) Préparer le fichier d'inventaire**
+Adapter le chemin de `inventaire.csv` dans :
 
-- Placez le fichier `inventaire.csv` dans le répertoire MySQL :
-  ```
-  C:/ProgramData/MySQL/MySQL Server <VERSION>/Uploads/inventaire.csv
-  ```
+```text
+SQL/creation_tables.sql
+```
 
-**b) Créer la base de données**
+puis exécuter :
 
-- Ouvrez phpMyAdmin ou MySQL Workbench
-- Importez le fichier `SQL/creation_tables.sql`
-- **Important** : Modifiez le chemin du fichier CSV dans le script :
-  ```sql
-  LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.1/Uploads/inventaire.csv'
-  INTO TABLE TempJeux
-  ```
+```text
+SQL/creation_tables.sql
+SQL/script_insertion.sql
+```
 
-**c) Insérer les données**
+### Configurer la connexion
 
-- Importez le fichier `SQL/script_insertion.sql`
+Modifier :
 
-**d) Configurer la connexion**
+```text
+app/identifiants/identifiant.php
+```
 
-- Modifiez `app/identifiants/identifiant.php` :
-  ```php
-  <?php
-  $dsn = 'mysql:host=localhost;dbname=nom_de_votre_bdd';
-  $host = 'localhost';
-  $username = 'votre_utilisateur';
-  $password = 'votre_mot_de_passe';
-  $database = 'nom_de_votre_bdd';
-  ?>
-  ```
+avec les identifiants de votre environnement local.
 
-#### 3. Configuration du serveur web
-
-**a) Placer l'application**
-
-- Copiez le dossier `app/` dans `C:/xampp/htdocs/`
-
-**b) Démarrer les services**
-
-- Lancez XAMPP Control Panel
-- Démarrez Apache et MySQL
-- Accédez à l'application : `http://localhost/app/`
-
-#### 4. Configuration des scripts Python
-
-**a) Installer les dépendances**
+### Installer les dépendances Python
 
 ```bash
-cd scripts/scripts_nettoyage/
-pip install pandas openpyxl
+pip install pandas openpyxl mysql-connector-python
 ```
 
-**b) Tester les scripts**
+### Lancer l'application
 
-```bash
-python main.py
-```
+Placer `app/` dans le répertoire web Apache/XAMPP, démarrer Apache et MySQL puis ouvrir :
 
----
-
-## 🔧 Utilisation
-
-### 👤 Première connexion
-
-1. Accédez à `http://localhost/app/`
-2. Cliquez sur "Connexion/Inscription"
-3. Créez un compte ou connectez-vous
-4. Pour l'administration, utilisez un compte avec le rôle "Admin"
-
-### 🔍 Recherche de jeux
-
-- **Recherche simple** : Barre de recherche sur la page d'accueil
-- **Recherche avancée** : Filtres par auteur, mécanisme, catégorie, etc.
-- **Liste complète** : Consultation de tous les jeux avec pagination
-
-### 📚 Gestion des prêts
-
-1. Connectez-vous avec un compte utilisateur
-2. Recherchez le jeu souhaité
-3. Cliquez sur "Emprunter"
-4. Les administrateurs peuvent gérer les retours
-
-### ⚙️ Administration
-
-- **Gestion des utilisateurs** : Création et modification des comptes
-- **Gestion des prêts** : Validation et suivi des emprunts
-- **Export de données** : Génération de rapports Excel
-
----
-
-#### 2. Préparer la base de données
-1. **Importer l'inventaire fictif** :
-   - Déplacez le fichier `inventaire.csv` dans le répertoire suivant (selon la version MySQL installée) :
-     ```
-     C:/ProgramData/MySQL/MySQL Server <VERSION>/Uploads/inventaire.csv
-     ```
-   - Assurez-vous que le fichier est accessible dans ce dossier.
-
-2. **Exécuter le script de création des tables** :
-   - Ouvrez votre interface de gestion MySQL (ex. phpMyAdmin ou ligne de commande).
-   - Importez le fichier `sql/creation_tables.sql` dans votre base de données.
-   - **Remarque importante** : Modifiez la localisation du fichier `inventaire.csv` dans le script pour refléter l'emplacement exact de votre fichier. 
-   Exemple :
-     ```sql
-     LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/inventaire.csv'
-     INTO TABLE ...
-     ```
-
-3. **Insérer les données** :
-   - Importez ensuite les scripts d'insertion `sql/script_insertion.sql`.
-
-4. **Configurer le fichier `identifiant.php`** :
-   - Ouvrez le fichier `app/identifiants/identifiant.php`.
-   - Remplacez les informations par celles correspondant à votre environnement :
-     ```php
-     <?php
-
-     $dsn = 'mysql:host=localhost;dbname=NomDeVotreBDD';
-     $username = 'VotreNomUtilisateur';
-     $password = 'VotreMotDePasse';
-
-     ?>
-     ```
-=======
-## 📁 Structure complète du projet
-
-```
-SAE4.01-Developpement-d-une-application-develop/
-├── app/                          # Application web principale
-│   ├── Controllers/              # Contrôleurs MVC
-│   ├── Models/                   # Modèles de données
-│   ├── Views/                    # Vues et templates
-│   ├── Content/                  # Ressources statiques
-│   ├── identifiants/             # Configuration BDD
-│   └── scripts/                  # Scripts d'exportation
-├── SQL/                          # Scripts de base de données
-│   ├── creation_tables.sql       # Création des tables
-│   └── script_insertion.sql      # Insertion des données
-├── scripts/                      # Scripts Python
-│   ├── data/                     # Données et exports
-│   └── scripts_nettoyage/        # Nettoyage des données
-├── archive/                      # Prototypes et versions précédentes
-└── README.md                     # Documentation principale
+```text
+http://localhost/app/
 ```
 
 ---
 
-## 🐛 Dépannage
+## Équipe
 
-### Problèmes courants
+Projet développé avec :
 
-**Erreur de connexion à la base de données**
-
-- Vérifiez les paramètres dans `identifiant.php`
-- Assurez-vous que MySQL est démarré
-- Vérifiez les permissions utilisateur
-
-**Fichier CSV non trouvé**
-
-- Vérifiez le chemin dans `creation_tables.sql`
-- Assurez-vous que le fichier est dans le bon répertoire MySQL
-
-**Script Python ne fonctionne pas**
-
-- Vérifiez l'installation de Python
-- Installez les dépendances : `pip install pandas openpyxl`
-- Vérifiez les permissions d'exécution
-
-**Page blanche ou erreur 500**
-
-- Vérifiez les logs d'erreur Apache
-- Assurez-vous que PHP est activé dans XAMPP
-- Vérifiez la syntaxe PHP
+- [Lasry BESKIWIN](https://github.com/Lasryy)
+- [Rania BOUSFIHA](https://github.com/rania212)
+- [Safiya NGUYEN](https://github.com/safiya-ng)
+- [Ahash PARTHIPAN](https://github.com/AhashPARTHIPAN)
+- [Jules RICHARDOT](https://github.com/JulesRichardot)
 
 ---
 
-## 🛡️ Technologies utilisées
+## Ce que ce projet démontre
 
-### Backend
+Ce projet met notamment en avant :
 
-- **PHP** : Langage principal de l'application
-- **MySQL** : Base de données relationnelle
-- **Architecture MVC** : Organisation du code
+- le développement web full stack
+- l'architecture MVC en PHP
+- la modélisation relationnelle
+- SQL et MySQL
+- l'authentification et la gestion de sessions
+- le traitement de données volumineuses
+- l'automatisation en Python
+- Pandas et OpenPyXL
+- la migration de données
+- le développement collaboratif
+- la conception d'une application répondant à des besoins métier
 
-### Frontend
-
-- **HTML5** : Structure des pages
-- **CSS3** : Styles et mise en page
-- **JavaScript** : Interactions utilisateur
-
-### Scripts et outils
-
-- **Python 3.x** : Scripts de nettoyage et export
-- **Pandas** : Manipulation des données
-- **OpenPyXL** : Génération de fichiers Excel
-
-### Serveur
-
-- **Apache** : Serveur web
-- **XAMPP** : Environnement de développement
-
----
-
-## 👥 Équipe du projet
-
-- **[Lasry BESKIWIN](https://github.com/Lasryy)**
-- **[Rania BOUSFIHA](https://github.com/rania212)**
-- **[Safiya NGUYEN](https://github.com/safiya-ng)**
-- **[Ahash PARTHIPAN](https://github.com/AhashPARTHIPAN)**
-- **[Jules RICHARDOT](https://github.com/JulesRichardot)**
-
----
-
-## 📄 Licence
-
-Ce projet est développé dans le cadre de la SAE4.01 de l'Université Sorbonne Paris Nord.
-
----
-
-_Dernière mise à jour : Juin 2025_
+</details>
